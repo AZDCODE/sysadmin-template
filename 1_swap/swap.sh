@@ -19,10 +19,19 @@ fi
 # Configurar els permisos
 chmod 600 "$SWAPFILE"
 
-# Preparar el fitxer com a swap, si encara no esta activat
-if ! swapon --show=NAME --noheadings | grep -Fxq "$SWAPFILE"; then
+# Preparar la swap nomes quan es crea per primera vegada
+if ! blkid "$SWAPFILE" | grep -q 'TYPE="swap"'; then
     mkswap "$SWAPFILE"
+fi
+
+# Activar la swap si encara no esta activa
+if ! swapon --show=NAME --noheadings | grep -Fxq "$SWAPFILE"; then
     swapon "$SWAPFILE"
+fi
+
+# Activar automaticament la swap en reiniciar
+if ! grep -Fq "$SWAPFILE none swap" /etc/fstab; then
+    echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
 fi
 
 echo "Swap activada correctament!"

@@ -1,10 +1,23 @@
 #!/bin/bash
 
+set -e
+
+# Comprovar permisos d'administrador
+if [ "$EUID" -ne 0 ]; then
+    echo "Error: executa aquest script amb sudo"
+    exit 1
+fi
+
+# Anar a la carpeta on es troba el script
+cd "$(dirname "$0")"
+
 echo "Enabling swap..."
-. ./1_swap/swap.sh
+bash ./1_swap/swap.sh
 
 echo "Configuring users..."
-. ./2_users/users.sh
+bash ./2_users/users.sh
 
 echo "Enabling tmpfs..."
-. ./3_tmpfs/tmpfs.sh
+bash ./3_tmpfs/tmpfs.sh
+
+echo "Configuracio completada correctament!"
